@@ -42,12 +42,12 @@ export default {
             if (!confirm_password) {
                 throw { code: 400, message: "Enter the  correct password" }
             }
-            if(password !== confirm_password){
-                throw {code : 400, message: "Check the password properly"}
+            if (password !== confirm_password) {
+                throw { code: 400, message: "Check the password properly" }
             }
-            let existingUser = await User.findOne({email});
-            if(existingUser){
-                throw {code :409, message : "user already exists"}
+            let existingUser = await User.findOne({ email });
+            if (existingUser) {
+                throw { code: 409, message: "user already exists" }
             }
             let hashedPassword = await bcrypt.hash(password, 10);
             let createUser = await User.create({
@@ -55,43 +55,41 @@ export default {
                 email: email,
                 password: hashedPassword
             });
-            return {code : 201, message : "User registered successfully!",data : {id:createUser._id,name:createUser.name,email:createUser.email}}
+            return { code: 201, message: "User registered successfully!", data: { id: createUser._id, name: createUser.name, email: createUser.email } }
         } catch (error) {
             console.log(error);
             throw { code: error.code || 500, message: error.message || "Internal Server error" }
         }
     },
 
-    async loginUser(body){
-        try{
+    async loginUser(body) {
+        try {
             const {
                 email,
                 password
             } = body;
-
-            if(!email || email.trim() === ""){
-                throw {code : 400 , message : "email id required" }
+            if (!email || email.trim() === "") {
+                throw { code: 400, message: "email id required" }
             }
-            if(!emailValidator.validate(email)){
-                throw { code : 400, message : "Invalid email"}
+            if (!emailValidator.validate(email)) {
+                throw { code: 400, message: "Invalid email" }
             }
-            if(!password || password.trim() === ""){
-                throw {code : 400, message : "password is required"}
+            if (!password || password.trim() === "") {
+                throw { code: 400, message: "password is required" }
             }
-
-            let findUser = await User.findOne({email});
-            console.log(findUser);return;
-            if(!findUser){
-                throw {code : 404, message : "User not found"}
+            let normalizedEmail = email.trim().toLowerCase();
+            let findUser = await User.findOne({ email: normalizedEmail }).select("+password");
+            if (!findUser) {
+                throw { code: 404, message: "User not found" }
             }
-            let comparePassword = await bcrypt.compare(password,findUser.password);   
-            if(!comparePassword){
-                throw {code : 400 , message : "Incorrect  password, try again later"}
+            let comparePassword = await bcrypt.compare(password, findUser.password);
+            if (!comparePassword) {
+                throw { code: 400, message: "Incorrect  password, try again later" }
             }
-            let token = jwt.sign({user_id: findUser._id,username:findUser.name,email:findUser.email},process.env.SECRET,{expiresIn : "1d"});
-            return {code : 200 , message : "User login successfully",token,data: {id : findUser._id,name : findUser.name, email : findUser.email}};
-        }catch(error){
-            throw {code : error.code || 500, message : error.message || "Internal Error Error"}
+            let token = jwt.sign({ user_id: findUser._id, username: findUser.name, email: findUser.email }, process.env.SECRET, { expiresIn: "1d" });
+            return { code: 200, message: "User login successfully", token, data: { id: findUser._id, name: findUser.name, email: findUser.email } };
+        } catch (error) {
+            throw { code: error.code || 500, message: error.message || "Internal Error Error" }
         }
     }
 }
