@@ -3,6 +3,7 @@ import PasswordValidator from 'password-validator';
 import bcrypt from "bcrypt";
 import User from '../models/userModel.js';
 
+
 export default {
 
     async registerUser(body) {
@@ -58,6 +59,39 @@ export default {
         } catch (error) {
             console.log(error);
             throw { code: error.code || 500, message: error.message || "Internal Server error" }
+        }
+    },
+
+    async loginUser(body){
+        try{
+            const {
+                email,
+                password
+            } = body;
+
+            if(!email || email.trim() === ""){
+                throw {code : 400 , message : "email id required" }
+            }
+            if(!emailValidator.validate(email)){
+                throw { code : 400, message : "Invalid email"}
+            }
+            if(!password || password.trim() === ""){
+                throw {code : 400, message : "password is required"}
+            }
+
+            let findUser = await User.findOne({email});
+            console.log(findUser);return;
+            if(!findUser){
+                throw {code : 404, message : "User not found"}
+            }
+            let comparePassword = await bcrypt.compare(password,findUser.password);   
+            if(!comparePassword){
+                throw {code : 400 , message : "Incorrect  password, try again later"}
+            }
+            let token = jwt.sign({user_id: findUser._id,username:findUser.name,email:findUser.email},process.env.SECRET,{expiresIn : "1d"});
+            return {code : 200 , message : "User login successfully",token,data: {id : findUser._id,name : findUser.name, email : findUser.email}};
+        }catch(error){
+            throw {code : error.code || 500, message : error.message || "Internal Error Error"}
         }
     }
 }

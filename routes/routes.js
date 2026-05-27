@@ -4,6 +4,6 @@ import registerAndLoginController from "../controllers/registerAndLoginControlle
 const router = express.Router();
 
 router.post('/register',registerAndLoginController.registerUser);
-
+router.post('/login',registerAndLoginController.loginUser);
 
 export default router;
