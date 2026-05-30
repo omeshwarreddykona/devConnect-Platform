@@ -1,6 +1,8 @@
 import express from "express";
 import router from "./routes/routes.js";
 import connectDB from "./database/db.js";
+import helmet from "helmet";
+import morgan from "morgan";
 import { config } from "dotenv";
 config();
 
@@ -10,7 +12,8 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
-
+app.use(helmet());
+app.use(morgan("dev"));
 
 connectDB();
 
