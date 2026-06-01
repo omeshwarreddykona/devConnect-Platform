@@ -1,12 +1,13 @@
 import jwt from "jsonwebtoken";
-const secret = process.env.SECRET;
 
-if (!secret) {
-    throw new Error("JWT Secret is missing")
-}
 
 function verifyUser() {
     return (req, res, next) => {
+        const secret = process.env.SECRET;
+
+        if (!secret) {
+            throw { code: 404, message: "Jwt secret is missing" }
+        }
         const token = req.headers.authorization;
         if (!token || !token.startsWith("Bearer ")) {
             return res.status(401).json({ success: false, message: "Token missing,Access denied" })
@@ -27,3 +28,6 @@ function verifyUser() {
         }
     }
 }
+
+
+export default verifyUser;

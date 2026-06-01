@@ -16,5 +16,14 @@ export default {
         }).catch(error => {
             next(error)
         })
+    },
+
+    async getProfile(req, res, next) {
+        try {
+            let result = await services.getProfile(req.user._id);
+            res.status(200).json(result);
+        } catch (error) {
+            next(error)
+        }
     }
 }

@@ -92,5 +92,18 @@ export default {
         } catch (error) {
             throw { code: error.code || 500, message: error.message || "Internal Error Error" }
         }
+    },
+
+    async getProfile(user_id) {
+        try {
+            let user = await User.findById(user_id);
+            if (!user) {
+                throw { code: 404, message: "User not found" }
+            }
+            return { code: 200, message: "User fetched data", data: { id: user._id, name: user.name, email: user.email } }
+            
+        } catch (error) {
+            throw { code: error.code || 500, message: error.message || "Internal Server Error" }
+        }
     }
 }
