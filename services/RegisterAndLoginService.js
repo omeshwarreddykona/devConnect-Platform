@@ -100,7 +100,7 @@ export default {
             if (!user) {
                 throw { code: 404, message: "User not found" }
             }
-            return { code: 200, message: "User fetched data", data: { id: user._id, name: user.name, email: user.email } }
+            return { code: 200, message: "Profile data fetched Successfully", data: { id: user._id, name: user.name, email: user.email } }
             
         } catch (error) {
             throw { code: error.code || 500, message: error.message || "Internal Server Error" }
