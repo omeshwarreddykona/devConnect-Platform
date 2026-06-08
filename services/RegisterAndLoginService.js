@@ -3,6 +3,8 @@ import PasswordValidator from 'password-validator';
 import bcrypt from "bcrypt";
 import User from '../models/userModel.js';
 import jwt from "jsonwebtoken";
+import blackListedToken from '../ulits/tokenBlackList.js';
+
 
 
 export default {
@@ -101,7 +103,17 @@ export default {
                 throw { code: 404, message: "User not found" }
             }
             return { code: 200, message: "Profile data fetched Successfully", data: { id: user._id, name: user.name, email: user.email } }
-            
+
+        } catch (error) {
+            throw { code: error.code || 500, message: error.message || "Internal Server Error" }
+        }
+    },
+    async logOutUser(accessToken) {
+        try {
+            blackListedToken.add(accessToken)
+            return {
+                success: true, code: 200, message: "User LogOut Successfully"
+            }
         } catch (error) {
             throw { code: error.code || 500, message: error.message || "Internal Server Error" }
         }
